@@ -1,12 +1,4 @@
-# arb_vs_pev_analysis.R
-# Purpose: Compare Arbitrage vs Positive EV (ML/Spread/Totals) on:
-# - Win rate, ROI (per-bet profit), variance
-# - Calibration (EV -> realized ROI) for Positive EV
-# - Time series (cumulative profit) with Max Drawdown
-# - Optional sample-size balancing (overall or per-day)
-#
-# NOTE: This script is READ-ONLY with respect to your Java pipeline.
-# It only reads CSVs emitted by Java and writes plots/tables to out_dir.
+
 
 options(repos = c(CRAN = "https://cloud.r-project.org"))
 
@@ -27,9 +19,7 @@ suppressPackageStartupMessages({
   library(lubridate); library(stringr); library(purrr); library(scales); library(broom)
 })
 
-# =========================
-# Settings (EDIT IF NEEDED)
-# =========================
+
 paths <- list(
   arb_ml  = "arbitrageML.csv",
   arb_sp  = "arbitrageSpread.csv",
@@ -46,9 +36,7 @@ dedupe <- TRUE              # drop clear duplicate rows
 cap_weight <- 10            # guard against extreme upweighting
 set.seed(42)                # reproducibility for bootstraps
 
-# =========================
-# Helpers
-# =========================
+
 read_one <- function(fp) {
   if (!file.exists(fp)) stop(paste("Missing file:", fp))
   df <- readr::read_csv(fp, show_col_types = FALSE)
@@ -119,9 +107,7 @@ binom_ci <- function(k, n, conf = 0.95) {
   c(centre - adj, centre, centre + adj)
 }
 
-# =========================
-# Load + unify
-# =========================
+
 dfs <- purrr::imap(paths, ~{
   res <- safe_read(.x)
   if (!is.null(res$error)) stop(res$error)
@@ -157,9 +143,7 @@ if (dedupe) {
   message(sprintf("[dedupe] %d -> %d rows (removed %d)", before, after, before - after))
 }
 
-# =========================
-# Weighting (balancing)
-# =========================
+
 data <- data %>% mutate(w = 1.0)
 
 if (balance_mode == "overall") {
@@ -181,9 +165,7 @@ if (balance_mode == "overall") {
 
 data <- data %>% mutate(w = pmin(w, cap_weight))
 
-# =========================
-# Core summaries
-# =========================
+
 sum_overall <- data %>%
   group_by(strategy) %>%
   summarise(
@@ -229,9 +211,7 @@ ci_overall <- data %>%
   ) %>%
   select(-win_rate_ci, -roi_ci)
 
-# =========================
-# Calibration (Positive EV)
-# =========================
+
 pev <- data %>% filter(strategy=="Positive EV", is.finite(ev), is.finite(roi))
 cor_ev_profit <- if (nrow(pev) > 3) cor(pev$ev, pev$roi, use="complete.obs") else NA_real_
 
@@ -258,9 +238,7 @@ if (nrow(pev) > 0) {
     )
 }
 
-# =========================
-# Time series + Max Drawdown
-# =========================
+
 ts <- data %>%
   mutate(date_day = as_date(date)) %>%
   group_by(strategy, date_day) %>%
@@ -278,9 +256,7 @@ dd_tbl <- ts %>% group_by(strategy) %>%
     .groups = "drop"
   )
 
-# =========================
-# Write tables
-# =========================
+
 if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
 write_csv(sum_overall, file.path(out_dir, "summary_overall_weighted.csv"))
 write_csv(sum_by_type,  file.path(out_dir, "summary_by_type_weighted.csv"))
@@ -288,9 +264,7 @@ write_csv(ci_overall,   file.path(out_dir, "summary_overall_confidence_intervals
 if (nrow(pevc)) write_csv(pevc, file.path(out_dir, "positiveEV_calibration_by_decile_weighted.csv"))
 write_csv(dd_tbl,       file.path(out_dir, "max_drawdown_by_strategy.csv"))
 
-# =========================
-# Plots (compact set)
-# =========================
+
 # 1) ROI density
 p_dist <- ggplot(data, aes(x=roi, weight=w, color=strategy, fill=strategy)) +
   geom_density(alpha=0.25, adjust=1.1) +
@@ -330,9 +304,7 @@ p_bars <- ggplot(roi_bars, aes(x=strategy, y=roi_md)) +
   theme_minimal()
 ggsave(file.path(out_dir, "plot_overall_roi_with_ci.png"), p_bars, width=6, height=4, dpi=160)
 
-# =========================
-# Console digest
-# =========================
+
 cat("\n=== DIGEST (balance_mode =", balance_mode, ") ===\n")
 print(sum_overall)
 cat("\n-- by bet type --\n"); print(sum_by_type)
