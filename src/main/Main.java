@@ -17,7 +17,7 @@ public class Main {
         String section = args[0].toLowerCase();   // positiveEV | arbitrage | middle | bankroll
         String market  = args[1].toLowerCase();   // ml | spread | totals | all
 
-        // Optional inputs: [marketPath] [allGamesPath]
+    
         String marketPath = argOr(args, 2, "data/" + defaultMarketDir(market));
         String allPath    = argOr(args, 3, "data/all_games");
 
