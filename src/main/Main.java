@@ -6,7 +6,7 @@ import java.io.File;
 public class Main {
 
     public static void main(String[] args) {
-        // Debug banner so we know the new build is running
+        // Debug banner to know the build is running
         System.out.println("Main build tag: BK_ENABLED");
 
         if (args.length < 2) {
