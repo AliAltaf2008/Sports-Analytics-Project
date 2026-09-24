@@ -2,7 +2,7 @@
 
 options(repos = c(CRAN = "https://cloud.r-project.org"))
 
-# ---- graphics / packages ----
+
 if (!requireNamespace("ragg", quietly = TRUE)) install.packages("ragg", dependencies = TRUE)
 if (requireNamespace("ragg", quietly = TRUE)) {
   Sys.setenv(R_GRAPHICS_DEVICE = "ragg_png")
@@ -31,10 +31,10 @@ paths <- list(
 out_dir <- "analysis_outputs"
 if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
 
-balance_mode <- "per_day"   # one of: "none", "overall", "per_day"
-dedupe <- TRUE              # drop clear duplicate rows
-cap_weight <- 10            # guard against extreme upweighting
-set.seed(42)                # reproducibility for bootstraps
+balance_mode <- "per_day" 
+dedupe <- TRUE           
+cap_weight <- 10           
+set.seed(42)                
 
 
 read_one <- function(fp) {
@@ -48,7 +48,6 @@ read_one <- function(fp) {
     df$date <- dt
   }
 
-  # Coerce success -> logical
   if ("success" %in% names(df)) {
     if (!is.logical(df$success)) {
       if (is.numeric(df$success)) df$success <- df$success > 0.5
@@ -97,7 +96,7 @@ mean_ci <- function(x, conf = 0.95) {
 }
 
 binom_ci <- function(k, n, conf = 0.95) {
-  # Wilson score interval
+ 
   if (n == 0) return(c(NA, NA, NA))
   p <- k/n
   z <- qnorm((1+conf)/2)
@@ -131,7 +130,7 @@ data <- dplyr::bind_rows(dfs) %>%
       TRUE ~ "Unknown"
     ),
     date = lubridate::as_datetime(date),
-    roi  = profit # per-bet profit already normalized by your Java sim
+    roi  = profit 
   ) %>%
   dplyr::filter(!is.na(date), is.finite(roi))
 
@@ -192,7 +191,7 @@ sum_by_type <- data %>%
     .groups = "drop"
   ) %>% arrange(strategy, betType)
 
-# Confidence intervals (unweighted simple CIs for readability)
+
 ci_overall <- data %>%
   group_by(strategy) %>%
   summarise(
@@ -218,10 +217,10 @@ cor_ev_profit <- if (nrow(pev) > 3) cor(pev$ev, pev$roi, use="complete.obs") els
 pevc <- tibble()
 if (nrow(pev) > 0) {
   q <- quantile(pev$ev, probs=seq(0,1,by=0.1), na.rm=TRUE, type=7)
-  # ensure unique breaks to avoid empty/NA labels
+  
   brks <- unique(q)
   if (length(brks) < 3) {
-    # fallback: fixed small buckets
+   
     brks <- c(min(pev$ev, na.rm=TRUE)-1e-9, 0, max(pev$ev, na.rm=TRUE)+1e-9)
   }
   pev$ev_decile <- cut(pev$ev, breaks=brks, include.lowest=TRUE, labels=FALSE)
