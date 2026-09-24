@@ -146,15 +146,12 @@ public class GameDataB {
             g.bookId   = asInt(n, "book_id");
             g.teamId   = asInt(n, "team_id");
             g.aTeamId  = asInt(n, "a_team_id");
-
-            // ✅ FIX: use spread1/spread2 here, not totals
             g.spread1  = asDouble(n, "spread1");
             g.spread2  = asDouble(n, "spread2");
 
             g.price1   = asDouble(n, "price1");  // American odds
             g.price2   = asDouble(n, "price2");
 
-            // some feeds also include totals in the same file; keep if present
             g.total1   = asDouble(n, "total1");
             g.total2   = asDouble(n, "total2");
 
