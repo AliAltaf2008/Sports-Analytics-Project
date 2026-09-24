@@ -40,9 +40,7 @@ public class Main {
         }
     }
 
-    // =========================
-    // POSITIVE EV
-    // =========================
+
     private static void runEV(Simulator sim, String market, String marketPath, String allPath) throws Exception {
         if (isML(market)) {
             String outCsv = outFile("positiveEV", "ML");
@@ -65,9 +63,6 @@ public class Main {
         }
     }
 
-    // =========================
-    // ARBITRAGE
-    // =========================
     private static void runArbitrage(Simulator sim, String market, String marketPath, String allPath) throws Exception {
         if (isML(market)) {
             String outCsv = outFile("arbitrage", "ML");
@@ -90,9 +85,7 @@ public class Main {
         }
     }
 
-    // =========================
-    // BANKROLL (Positive EV only)
-    // =========================
+
     private static void runBankroll(Simulator sim, String market, String marketPath, String allPath) throws Exception {
         String outDir = "/Users/alialtaf/Documents/BettingSimulation/outputdata";
         ensureDir(outDir);
@@ -124,7 +117,6 @@ public class Main {
         }
     }
 
-    // ============= Helpers =============
     private static boolean isML(String s)     { return s.equals("ml") || s.equals("moneyline"); }
     private static boolean isSpread(String s) { return s.equals("spread"); }
     private static boolean isTotals(String s) { return s.equals("totals") || s.equals("total"); }
