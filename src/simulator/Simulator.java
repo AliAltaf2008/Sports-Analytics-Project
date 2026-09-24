@@ -9,12 +9,9 @@ import util.PositiveEV;
 
 public class Simulator {
 
-    // Flat-stake by default; you can change this later (e.g., Kelly fraction)
     private static final double STAKE_FRACTION = 1.0;
 
-    // -----------------------------
-    // Positive EV — MONEYLINE
-    // -----------------------------
+    //MoneyLine
     public void simulatePositiveEV_ML(String moneylineJsonPath, String allGamesJsonPath, String outputCsvPath) {
         List<GameDataB> oddsList    = GameDataB.loadAll(moneylineJsonPath);
         List<GameDataB> outcomeList = GameDataB.loadAll(allGamesJsonPath);
@@ -95,9 +92,7 @@ public class Simulator {
         System.out.println("[EV-ML] games=" + byGame.size() + " rows_written=" + kept + " → " + outputCsvPath);
     }
 
-    // -----------------------------
-    // Positive EV — SPREAD
-    // -----------------------------
+    //EV Spread
     public void simulatePositiveEV_Spread(String spreadJsonPath, String allGamesJsonPath, String outputCsvPath) {
         System.out.println("[EV-Spread] ts=" + System.currentTimeMillis());
 
@@ -107,7 +102,7 @@ public class Simulator {
         int nRows = (lineList == null ? 0 : lineList.size());
         System.out.println("[EV-Spread] input_rows=" + nRows);
 
-        // games with >= 2 books (diagnostic)
+      
         Map<String, Set<String>> bk = new HashMap<>();
         for (GameDataB g : lineList) {
             if (g == null || g.getGameId() == null) continue;
@@ -139,7 +134,7 @@ public class Simulator {
                 "lineDiff","pHome","pAway","evHome","evAway","kept","reason"
         });
 
-        final double lineTol = 1.0; // allowable spread mismatch
+        final double lineTol = 1.0; 
         int games = 0, pairs = 0, kept = 0;
 
         for (Map.Entry<String, List<GameDataB>> e : byGame.entrySet()) {
@@ -322,9 +317,7 @@ public class Simulator {
         System.out.println("Spread EV simulation complete → " + outputCsvPath);
     }
 
-    // -----------------------------
-    // Positive EV — TOTALS
-    // -----------------------------
+      //Totals
     public void simulatePositiveEV_Totals(String totalsJsonPath, String allGamesJsonPath, String csvOutPath) {
         List<GameDataB> totals   = GameDataB.loadAll(totalsJsonPath);
         List<GameDataB> outcomes = GameDataB.loadAll(allGamesJsonPath);
@@ -409,9 +402,7 @@ public class Simulator {
         System.out.println("[EV-Totals] games=" + byGame.size() + " rows_written=" + sims.size() + " → " + csvOutPath);
     }
 
-    // -----------------------------
-    // Arbitrage wrappers (unchanged)
-    // -----------------------------
+   //Arbitrage Wrappers
     public void simulateArbitrage_ML(String moneylineJsonPath, String allGamesJsonPath, String csvOutPath) {
         List<GameDataB> ml       = GameDataB.loadAll(moneylineJsonPath);
         List<GameDataB> outcomes = GameDataB.loadAll(allGamesJsonPath);
@@ -436,9 +427,7 @@ public class Simulator {
         CsvWriter.writeResults(arbs, csvOutPath);
     }
 
-    // -----------------------------
-    // Helpers
-    // -----------------------------
+    //Helpers
     private Map<String, String> buildDateMap(List<GameDataB> outcomes) {
         Map<String, String> map = new HashMap<>();
         if (outcomes == null) return map;
@@ -476,7 +465,6 @@ public class Simulator {
 
     private static double parseD(String s) { try { return Double.parseDouble(s); } catch (Exception e) { return Double.NaN; } }
 
-    // === BANKROLL SIMS (start with $100, Half-Kelly 0.5, max 2% per bet) ===
 
 public void simulatePositiveEV_ML_Bankroll(String moneylineJsonPath,
 String allGamesJsonPath,
@@ -550,7 +538,7 @@ double dec = util.PositiveEV.decimalOdds(american);
 
 // stake sizing & settlement
 double stake = bk.sizeStake(pWin, dec);
-if (stake <= 0) continue; // skip tiny/negative Kelly
+if (stake <= 0) continue; 
 boolean success = false;
 if (actual != null && actual.getWinner() != null) {
 String pickTeamId = pickHome ? String.valueOf(soft.getTeamId()) : String.valueOf(soft.getaTeamId());
